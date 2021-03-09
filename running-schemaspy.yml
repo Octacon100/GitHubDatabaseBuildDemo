@@ -1,0 +1,26 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+resources:
+ containers:
+   - container: schemaspy
+     image: schemaspy/schemaspy:latest
+
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+  #On Java version 8. Can connect, now it can't write.
+#- script: docker run -v "$PWD/Output:/output" -v "$PWD/DB_Driver:/drivers" schemaspy/schemaspy:latest -t mssql08 -db DatabaseBuildDemo -host databasebuilddemo.database.windows.net -port 1433 -u databasebuilddemo -p BuildADbPl3as3
+- script: |
+    mkdir Output
+    chmod -R 777 $PWD/Output
+    docker run -v "$PWD/Output:/output" -v "$PWD/DB_Driver:/drivers" schemaspy/schemaspy:latest -t mssql08 -db DatabaseBuildDemo -host databasebuilddemo.database.windows.net -port 1433 -u databasebuilddemo -p BuildADbPl3as3
+  displayName: 'Running schemaspy'
+#- script: docker run -v "$PWD:/output" schemaspy/schemaspy:latest -dbhelp
+  #displayName: 'Running schemaspy'
+- publish: $(System.DefaultWorkingDirectory)/Output
+  artifact: 'DatabaseDocumentation'

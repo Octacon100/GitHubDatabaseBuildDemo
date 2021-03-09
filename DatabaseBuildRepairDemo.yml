@@ -1,0 +1,15 @@
+
+resources:
+ containers:
+   - container: flyway
+     image: flyway/flyway-azure:latest-alpine
+
+jobs:
+- job: Example_Database_Repair
+  timeoutInMinutes: 10
+  pool:
+    vmImage: ubuntu-16.04
+  steps:
+  - script: flyway -url='jdbc:sqlserver://databasebuilddemo.database.windows.net:1433;databaseName=DatabaseBuildDemo;user=databasebuilddemo;password=BuildADbPl3as3;' -user=databasebuilddemo -password=BuildADbPl3as3 -locations='filesystem:./' repair
+    target: flyway
+    name: Run_flyway_repair
