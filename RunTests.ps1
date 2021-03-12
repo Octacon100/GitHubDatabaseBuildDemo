@@ -1,7 +1,7 @@
  param (
-    [string]$serverName = "databasebuilddemo.database.windows.net",
-    [string]$databaseName = "DatabaseBuildDemo",
-    [string]$userName = "databasebuilddemo",
+    [string]$serverName = "",
+    [string]$databaseName = "",
+    [string]$userName = "",
     [string]$password = ""
  )
 

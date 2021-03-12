@@ -12,7 +12,8 @@ jobs:
   pool:
     vmImage: ubuntu-16.04
   steps:
-  - script: flyway -url='jdbc:sqlserver://$(SERVERNAME):$(PORT_NUMBER);databaseName=$(DATABASENAME);user=$(USER);password=$(PASSWORD);' -user=$(USER) -password=$(PASSWORD) -locations='filesystem:./' migrate
+  - script: flyway -url='jdbc:sqlserver://$(SERVERNAME):$(PORT_NUMBER);databaseName=$(DATABASENAME);user=$(USER);password=$(PASSWORD);' 
+            -user=$(USER) -password=$(PASSWORD) -locations='filesystem:./' migrate
     target: flyway
     name: Run_flyway_migrate
   - task: PowerShell@2
@@ -21,15 +22,6 @@ jobs:
     inputs:
       filePath: './RunTests.ps1'
       arguments: -serverName "$(SERVERNAME)" -databaseName "$(DATABASENAME)" -userName "$(USER)" -password "$(PASSWORD)"
-  - script: |
-      mkdir Output
-      chmod -R 777 $PWD/Output
-      docker run -v "$PWD/Output:/output" -v "$PWD/DB_Driver:/drivers" schemaspy/schemaspy:latest -t mssql08 -db $(DATABASENAME) -host $(SERVERNAME) -port $(PORT_NUMBER) -u $(USER) -p $(PASSWORD)
-    displayName: 'Running schemaspy'
-#- script: docker run -v "$PWD:/output" schemaspy/schemaspy:latest -dbhelp
-  #displayName: 'Running schemaspy'
-  - publish: $(System.DefaultWorkingDirectory)/Output
-    artifact: 'DatabaseDocumentation'
   - task: PublishTestResults@2 
     target: host
     inputs:
@@ -39,3 +31,11 @@ jobs:
   - publish: $(System.DefaultWorkingDirectory)
     target: flyway
     artifact: 'DatabaseArtifacts'
+  - script: |
+      mkdir Output
+      chmod -R 777 $PWD/Output
+      docker run -v "$PWD/Output:/output" -v "$PWD/DB_Driver:/drivers" schemaspy/schemaspy:latest -t mssql08 -db $(DATABASENAME) -host $(SERVERNAME) -port $(PORT_NUMBER) -u $(USER) -p $(PASSWORD)
+    displayName: 'Running schemaspy'
+  - publish: $(System.DefaultWorkingDirectory)/Output
+    artifact: 'DatabaseDocumentation'
+  
